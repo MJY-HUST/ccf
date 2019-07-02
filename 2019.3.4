@@ -1,0 +1,115 @@
+#include<iostream>
+#include<queue>
+using namespace std;
+void init_q(int num,string line);
+int check(int n);
+int q_empty(int n);
+struct pro{
+    char state;//R/S
+    int num;
+};
+
+queue<pro>q[10000];
+int main()
+{
+    string temp;
+    int T,n;
+    cin>>T>>n;
+    cin.get();//读取一个字符
+    for(int i=0;i<T;i++)
+    {
+        for(int j=0;j<n;j++)
+        {
+            getline(cin,temp);
+            init_q(j,temp);
+        }
+        if(check(n))
+            cout<<0<<'\n';
+        else
+        {
+            cout<<1<<'\n';
+            for(int j=0;j<n;j++)
+            {
+                while(!q[j].empty())
+                    q[j].pop();
+            }
+        }
+
+    }
+    return 0;
+}
+
+void init_q(int num,string line)
+{
+    struct pro temp;
+    for(unsigned int i=0;i<line.size();i++)
+    {
+        string pro_num;
+        int c_num=0;
+        int k;
+        if(line[i]=='R')
+            temp.state='R';
+        else temp.state='S';
+        for(k=1;line[i+k]!=' '&&(i+k)<line.size();k++)
+        {
+            pro_num+=line[i+k];
+        }
+        for(unsigned int j=0;j<pro_num.size();j++)
+        {
+            c_num=c_num*10+pro_num[j]-48;
+        }
+        temp.num=c_num;
+        //cout<<temp.state<<temp.num;
+        q[num].push(temp);
+        i=i+k;
+    }
+}
+
+int check(int n)
+{
+    int flag;
+    while(1)
+    {
+        flag=1;
+        if(q_empty(n))
+            return 1;
+        for(int i=0;i<n;i++)
+        {
+            if(q[i].empty())
+                continue;
+            int end_num=q[i].front().num;
+            if(q[end_num].empty())
+                return 0;
+            if(q[i].front().state!=q[end_num].front().state&&q[end_num].front().num==i)
+            {
+                q[i].pop();q[end_num].pop();flag=0;
+            }
+        }
+        if(flag)
+            return 0;
+    }
+}
+
+int q_empty(int n)
+{
+    for(int i=0;i<n;i++)
+    {
+        if(q[i].size()!=0)
+            return 0;
+    }
+    return 1;
+}
+
+/*
+3 2
+R1 S1
+S0 R0
+R1 S1
+R0 S0
+R1 R1 R1 R1 S1 S1 S1 S1
+S0 S0 S0 S0 R0 R0 R0 R0
+*/
+/*
+tip
+在检查的时候没有考虑某一进程为空的情况
+*/
