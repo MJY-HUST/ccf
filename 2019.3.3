@@ -1,0 +1,125 @@
+#include<iostream>
+#include<vector>
+#include<algorithm>
+using namespace std;
+int check(int b);
+string yihuo(string a,string b);
+struct hard_disk{
+    int num;
+    string data;
+};
+vector<hard_disk> hd;
+int n,s,l,m,b;
+string ans;
+int block_num=0;//总块数
+
+//bool paixu(hard_disk a,hard_disk b){ return a.num<b.num;}
+
+int main()
+{
+
+    cin>>n>>s>>l;
+    struct hard_disk temp;
+    for(int i=0;i<l;i++)
+    {
+        cin>>temp.num>>temp.data;
+        hd.push_back(temp);
+    }
+    if(l!=0)
+    {
+        block_num=hd.front().data.size()/8*(n-1);
+    }
+    //cout<<block_num<<'\n';
+    //sort(hd.begin(),hd.end(),paixu);
+
+    cin>>m;
+    for(int i=0;i<m;i++)
+    {
+        cin>>b;
+        if(check(b))
+            cout<<ans<<endl;
+        else cout<<'-'<<endl;;
+    }
+    return 0;
+}
+
+int check(int b)
+{
+    if(b>=block_num)
+        return 0;
+    int line=b/(s*(n-1));//目标块所在条带行
+    int block=n-line%n-1;//条带所在块号
+    int ans_block;
+    int ans_tiaodai;
+    if((n-1-block)*s>=b%(s*(n-1))+1)//右边
+    {
+        ans_block=b%(s*(n-1))/s+1+block;
+        ans_tiaodai=(b%(s*(n-1))+1)%s;
+        ans_tiaodai=ans_tiaodai==0?s:ans_tiaodai;
+    }
+    else
+    {
+        ans_block= (b%(s*(n-1))-(n-1-block)*s)/s;
+        ans_tiaodai=(b%(s*(n-1))+1-(n-1-block)*s)%s;
+        ans_tiaodai=ans_tiaodai==0?s:ans_tiaodai;
+    }
+    //cout<<ans_block<<' '<<ans_tiaodai<<endl;
+    for(unsigned int i=0;i<hd.size();i++)
+    {
+        if(hd[i].num==ans_block)
+        {
+            int start=line*s+ans_tiaodai;
+            ans=hd[i].data.substr(8*(start-1),8);
+            return 1;
+        }
+    }
+    if(n-l>1)
+        return 0;
+    ans="00000000";
+    int start=line*s+ans_tiaodai;
+    for(unsigned int i=0;i<hd.size();i++)
+    {
+        string tmp=hd[i].data.substr(8*(start-1),8);
+        ans=yihuo(ans,hd[i].data);
+    }
+    return 1;
+}
+
+string yihuo(string a,string b)
+{
+    string c;
+    int a_temp,b_temp;
+    int temp;char ch;
+    for(unsigned int i=0;i<a.size();i++)
+    {
+        if(a[i]>='0'&&a[i]<='9')
+            a_temp=a[i]-48;
+        else a_temp=a[i]-'A'+10;
+        if(b[i]>='0'&&b[i]<='9')
+            b_temp=b[i]-48;
+        else b_temp=b[i]-'A'+10;
+        temp=(a_temp^b_temp);
+        if(temp>=0&&temp<=9)
+            ch=(char)(temp+48);
+        else ch=(char)(temp-10+'A');
+        c+=ch;
+    }
+    return c;
+}
+
+/*
+3 2 2
+0 000102030405060710111213141516172021222324252627
+1 A0A1A2A3A4A5A6A7B0B1B2B3B4B5B6B7C0C1C2C3C4C5C6C7
+2
+2
+5
+*/
+/*
+2 1 2
+0 000102030405060710111213141516172021222324252627
+1 000102030405060710111213141516172021222324252627
+2
+0
+1
+*/
