@@ -1,0 +1,61 @@
+#include<iostream>
+#include<queue>
+#include<algorithm>
+using namespace std;
+struct xy{
+    int a;
+    int b;
+}xy[4]={{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+struct node{
+    int n;
+    int m;
+    int t;
+};
+int N,M,T;
+int q[101][101][301];
+queue<node>qqueue;
+int bfs()
+{
+    struct node start,f,temp;
+    start.n=1;
+    start.m=1;
+    start.t=0;
+    qqueue.push(start);
+    while(!qqueue.empty())
+    {
+        f=qqueue.front();
+        qqueue.pop();
+        if(f.n==N&&f.m==M)
+            break;
+        for(int i=0;i<4;i++)
+        {
+            temp.n=f.n+xy[i].a;
+            temp.m=f.m+xy[i].b;
+            temp.t=f.t+1;
+            if(q[temp.n][temp.m][temp.t]==1)
+                continue;
+            if(temp.n<1||temp.n>N||temp.m<1||temp.m>M)
+                continue;
+            qqueue.push(temp);
+            q[temp.n][temp.m][temp.t]=1;
+        }
+
+    }
+    return f.t;
+}
+
+int main()
+{
+    int ans,r,c,a,b;
+    //memset(q, 0, sizeof(q));
+    cin>>N>>M>>T;
+    for(int i=0;i<T;i++)
+    {
+        cin>>r>>c>>a>>b;
+        for(int j=a; j<=b; j++)
+            q[r][c][j] = 1;
+    }
+    ans=bfs();
+    cout<<ans<<endl;
+    return 0;
+}
